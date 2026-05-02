@@ -86,20 +86,27 @@ export async function createPacientes(pacientes: NuevoPaciente[]): Promise<{ ins
     return { insertados: 0, duplicados: 0 }
   }
 
-  const telefonos = pacientes.map(p => p.telefono)
+  // Check for duplicates: SAME phone + SAME date = duplicate
+  // If SAME phone but DIFFERENT date = allow (different appointment)
+  const pairs = pacientes.map(p => ({ telefono: p.telefono, fecha: p.fecha_procedimiento }))
   
   const { data: existentes, error: errFetch } = await supabase
     .from('pacientes')
-    .select('telefono')
-    .in('telefono', telefonos)
+    .select('telefono, fecha_procedimiento')
+    .in('telefono', pairs.map(p => p.telefono))
 
   if (errFetch) {
     console.error('Error checking duplicates:', errFetch)
     throw errFetch
   }
 
-  const telefonosExistentes = new Set(existentes?.map(p => p.telefono) || [])
-  const nuevos = pacientes.filter(p => !telefonosExistentes.has(p.telefono))
+  // Create a set of existing (phone, date) pairs
+  const existentesMap = new Set(
+    existentes?.map(p => `${p.telefono}|${p.fecha_procedimiento}`) || []
+  )
+  
+  // Filter: keep only if (phone, date) is NOT in existing
+  const nuevos = pacientes.filter(p => !existentesMap.has(`${p.telefono}|${p.fecha_procedimiento}`))
   const duplicados = pacientes.length - nuevos.length
 
   if (nuevos.length === 0) {
