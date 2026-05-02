@@ -146,32 +146,10 @@ async function iniciarBot() {
     console.log('-'.repeat(50))
     console.log(qr)
     console.log('-'.repeat(50))
-    console.log('\n💡 Si no puedes escanear, copia el código de arriba y pégalo en:')
+    console.log('\n💡 Si no puedes escanear, copia y pega en:')
     console.log('   https://api.qrserver.com/v1/create-qr-code/?data=' + encodeURIComponent(qr))
     console.log('='.repeat(50))
   })
-
-  client.on('ready', () => {
-    console.log('✅ WhatsApp conectado!')
-  })
-
-  client.on('message', async (msg) => {
-    if (msg.fromMe) return
-    if (msg.type !== 'chat') return
-    
-    try {
-      await handleMensaje(msg)
-    } catch (error) {
-      console.error('❌ Error manejando mensaje:', error.message)
-    }
-  })
-
-  client.on('disconnected', () => {
-    console.log('❌ WhatsApp desconectado')
-    process.exit(1)
-  })
-
-  await client.initialize()
 
   client.on('ready', async () => {
     console.log('✅ WhatsApp conectado!')
@@ -195,8 +173,28 @@ async function iniciarBot() {
     }
     
     if (pacientes.length === 0) {
-      console.log('ℹ️ No hay pacientes para enviar. El bot permanecerá escuchando...')
+      console.log('ℹ️ No hay pacientes para enviar. Escuchando mensajes...')
     }
   })
+
+  client.on('message', async (msg) => {
+    if (msg.fromMe) return
+    if (msg.type !== 'chat') return
+    
+    try {
+      await handleMensaje(msg)
+    } catch (error) {
+      console.error('❌ Error manejando mensaje:', error.message)
+    }
+  })
+
+  client.on('disconnected', () => {
+    console.log('❌ WhatsApp desconectado')
+    process.exit(1)
+  })
+
+  await client.initialize()
+  console.log('⏳ Esperando conexión...')
+}
 
 iniciarBot().catch(console.error)
