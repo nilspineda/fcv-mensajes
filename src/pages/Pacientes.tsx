@@ -256,14 +256,18 @@ export default function Pacientes() {
                     {paciente.estado === 'pendiente' ? (
                       <button
                         onClick={async () => {
+                          console.log('Enviando cambio para:', paciente.id, paciente.nombre)
                           try {
-                            await updatePaciente(paciente.id, { 
+                            const result = await updatePaciente(paciente.id, { 
                               estado: 'enviado',
                               fecha_envio: new Date().toISOString()
                             })
+                            console.log('Resultado:', result)
+                            alert('✓ Marcado como enviado. Ahora corre npm run whatsapp para enviar el mensaje.')
                             refresh()
-                          } catch (e) {
-                            console.error(e)
+                          } catch (e: any) {
+                            console.error('Error:', e)
+                            alert('Error al enviar: ' + (e.message || e))
                           }
                         }}
                         className="text-green-600 hover:text-green-800 text-sm font-medium"
