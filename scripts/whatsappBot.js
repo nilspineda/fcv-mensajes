@@ -173,23 +173,30 @@ async function iniciarBot() {
 
   await client.initialize()
 
-  const pacientes = await buscarPacientesParaEnviar()
-  console.log(`📋 Pacientes para enviar: ${pacientes.length}`)
+  client.on('ready', async () => {
+    console.log('✅ WhatsApp conectado!')
+    
+    const pacientes = await buscarPacientesParaEnviar()
+    console.log(`📋 Pacientes para enviar: ${pacientes.length}`)
 
-  for (const paciente of pacientes) {
-    try {
-      console.log(`📤 Enviando a ${paciente.nombre} (${paciente.whatsapp})...`)
-      const chatId = `${paciente.whatsapp}@c.us`
-      
-      const mensajeInicio = `Hola ${paciente.nombre}! Buenos días\n\nTu procedimiento está programadas para mañana. Por favor responde las siguientes preguntas:\n\n${PREGUNTAS[0]}\n\nResponde solo SI o NO`
-      
-      await client.sendMessage(chatId, mensajeInicio)
-      console.log(`✅ Enviado a ${paciente.nombre}`)
-      
-    } catch (error) {
-      console.error(`❌ Error.enviando a ${paciente.nombre}:`, error.message)
+    for (const paciente of pacientes) {
+      try {
+        console.log(`📤 Enviando a ${paciente.nombre} (${paciente.whatsapp})...`)
+        const chatId = `${paciente.whatsapp}@c.us`
+        
+        const mensajeInicio = `Hola ${paciente.nombre}! Buenos días\n\nTu procedimiento está programado para mañana. Por favor responde las siguientes preguntas:\n\n${PREGUNTAS[0]}\n\nResponde solo SI o NO`
+        
+        await client.sendMessage(chatId, mensajeInicio)
+        console.log(`✅ Enviado a ${paciente.nombre}`)
+        
+      } catch (error) {
+        console.error(`❌ Error.enviando a ${paciente.nombre}:`, error.message)
+      }
     }
-  }
-}
+    
+    if (pacientes.length === 0) {
+      console.log('ℹ️ No hay pacientes para enviar. El bot permanecerá escuchando...')
+    }
+  })
 
 iniciarBot().catch(console.error)
