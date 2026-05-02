@@ -253,12 +253,31 @@ export default function Pacientes() {
                   </td>
                   <td className="px-4 py-3">{getEstadoBadge(paciente.estado)}</td>
                   <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => setEditando(paciente)}
-                      className="text-blue-600 hover:text-blue-800 text-sm"
-                    >
-                      Editar
-                    </button>
+                    {paciente.estado === 'pendiente' ? (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await updatePaciente(paciente.id, { 
+                              estado: 'enviado',
+                              fecha_envio: new Date().toISOString()
+                            })
+                            refresh()
+                          } catch (e) {
+                            console.error(e)
+                          }
+                        }}
+                        className="text-green-600 hover:text-green-800 text-sm font-medium"
+                      >
+                        📤 Enviar
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setEditando(paciente)}
+                        className="text-blue-600 hover:text-blue-800 text-sm"
+                      >
+                        Editar
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))
