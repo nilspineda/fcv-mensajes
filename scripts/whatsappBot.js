@@ -1,10 +1,7 @@
 import pkg from 'whatsapp-web.js';
 const { Client, LocalAuth, MessageMedia } = pkg;
 import { createClient } from '@supabase/supabase-js'
-import QRCode from 'qrcode'
 import 'dotenv/config'
-import fs from 'fs'
-import http from 'http'
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_KEY || ''
@@ -130,57 +127,9 @@ async function handleMensaje(msg) {
   }
 }
 
-const QR_CODE_URL = 'http://localhost:9876/qr.png'
-let qrImage = ''
-
-function startServer() {
-  const server = http.createServer((req, res) => {
-    if (req.url === '/qr.png') {
-      res.writeHead(200, { 'Content-Type': 'image/png' })
-      res.end(qrImage, 'binary')
-      return
-    }
-    if (req.url === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html' })
-      res.end(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>WhatsApp QR - FCV</title>
-          <style>
-            body { font-family: Arial; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f5f5f5; }
-            h1 { color: #333; }
-            .qr { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            img { width: 300px; height: 300px; }
-            .status { margin-top: 20px; color: #666; }
-          </style>
-        </head>
-        <body>
-          <h1>📱 WhatsApp Bot - FCV</h1>
-          <div class="qr">
-            <img src="/qr.png" alt="QR Code" />
-          </div>
-          <p class="status">Escanea este código con tu WhatsApp</p>
-        </body>
-        </html>
-      `)
-      return
-    }
-    res.writeHead(404)
-    res.end()
-  })
-  
-  server.listen(9876, () => {
-    console.log('🌐 Servidor QR: http://localhost:9876')
-  })
-}
-
-startServer()
-
 async function iniciarBot() {
   console.log('🤖 Iniciando WhatsApp Bot...')
+  console.log('='.repeat(50))
 
   const client = new Client({
     authStrategy: new LocalAuth({
@@ -193,10 +142,13 @@ async function iniciarBot() {
   })
 
   client.on('qr', async (qr) => {
-    console.log('📱 QR Code generado')
-    console.log('📋 Escanea este código con WhatsApp:')
+    console.log('\n📱 ESCANEA ESTE CÓDIGO CON TU WHATSAPP:')
+    console.log('-'.repeat(50))
     console.log(qr)
-    console.log('📝 O copia y pega la URL del QR en: https://qrsandbox.com')
+    console.log('-'.repeat(50))
+    console.log('\n💡 Si no puedes escanear, copia el código de arriba y pégalo en:')
+    console.log('   https://api.qrserver.com/v1/create-qr-code/?data=' + encodeURIComponent(qr))
+    console.log('='.repeat(50))
   })
 
   client.on('ready', () => {
