@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wwebjs_auth/
+.wwebjs_cache/
+*.log
+.DS_Store
+.env.local
+.env.*.local
+.vite/
+tsconfig.tsbuildinfo
