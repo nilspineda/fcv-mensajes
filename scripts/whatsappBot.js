@@ -7,7 +7,7 @@ import fs from 'fs'
 import http from 'http'
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
-const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_KEY || ''
 
 const PREGUNTAS = [
   '1. ¿Ha tenido fiebre en las últimas 48 horas? (Responde SI o NO)',
@@ -193,9 +193,10 @@ async function iniciarBot() {
   })
 
   client.on('qr', async (qr) => {
-    console.log('📱 Generando QR...')
-    qrImage = await QRCode.toBuffer(qr, { margin: 1, width: 300 })
-    console.log('✅ QR en: http://localhost:9876')
+    console.log('📱 QR Code generado')
+    console.log('📋 Escanea este código con WhatsApp:')
+    console.log(qr)
+    console.log('📝 O copia y pega la URL del QR en: https://qrsandbox.com')
   })
 
   client.on('ready', () => {
